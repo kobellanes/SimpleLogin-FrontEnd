@@ -57,31 +57,11 @@ function LoginPage() {
 
             setTimeout(() => {
               setLoginLoader(false);
-              navigate("/patient");
+              navigate("/home");
             }, 400);
 
           }
         }).catch(err => console.log(err.message));
-      } else if (user && role === "xslqychaazdnvqteuchuqqnnkhzflazdrufpr" && result.data.message.status == "404zoejknolksiajk") {
-        const randomToken = generateRandomToken(1000);
-
-        const generateToken = {
-          id: user,
-          accessToken: randomToken,
-        };
-
-        http.put(`accounts/${user}`, generateToken).then(result => {
-          if (result.data.status === '404zoejknolksiajk') {
-            localStorage.setItem("qygzfhIgkyd", randomToken);
-
-            setTimeout(() => {
-              setLoginLoader(false);
-              navigate("/doctor-patient");
-            }, 400);
-
-          }
-        }).catch(err => console.log(err.message));
-
       } else {
         setTimeout(() => {
           setUserPrompt(true);

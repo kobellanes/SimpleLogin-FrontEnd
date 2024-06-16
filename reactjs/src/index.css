@@ -42,3 +42,9 @@
 .eye-signup {
   margin-top: 500px;
 }
+
+.geo-input {
+  padding: 10px;
+  margin: 10px;
+  width: 300px;
+}
