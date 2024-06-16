@@ -3,6 +3,7 @@ import './App.css';
 import LoginPage from "./components/LoginPage/LoginPage";
 import SignUp from "./components/SignUp/SignUp";
 import Home from "./components/HomePage/Home";
+import NotFound from "./components/NotFound/NotFound";
 
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
           <Route path="/register" element={<SignUp />}></Route>
           <Route path="/home" element={<Home />}></Route>
 
-
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter >
     </>

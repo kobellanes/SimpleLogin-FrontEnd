@@ -1,10 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import http from '../../http';
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa6";
 
 function LoginPage() {
+  const entry = localStorage.getItem("qygzfhIgkyd");
+  const [accountDetails, setAccountDetails] = useState({});
+
+  const [finalLoader, setFinalLoader] = useState(true);
+
+  const [authorized, setAuthorized] = useState();
+
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      try {
+        const result = await http.post('/login', { accessToken: entry });
+        const filter = result.data.filter((account) => account.accessToken === entry);
+
+        if (filter.length === 0 || filter[0].status !== "wbpaztjspekazgkaznnwltpanw") {
+          setAuthorized("false");
+          localStorage.clear();
+        } else {
+          // navigate(`/home`);
+          setAccountDetails(filter[0]);
+          setAuthorized("true");
+        }
+      } catch (error) {
+        console.error('Error fetching account:', error);
+        setAuthorized("false");
+      } finally {
+        setTimeout(() => {
+          setFinalLoader(false);
+        }, 1000);
+      }
+    };
+
+    fetchAccount();
+  }, [entry]);
 
   const generateRandomToken = (length) => {
     const characters =
@@ -18,8 +54,6 @@ function LoginPage() {
 
     return token;
   };
-
-  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,7 +91,7 @@ function LoginPage() {
 
             setTimeout(() => {
               setLoginLoader(false);
-              navigate("/home");
+              // navigate("/home");
             }, 400);
 
           }
@@ -75,129 +109,137 @@ function LoginPage() {
     });
   };
 
-  return (
-    <>
-      <section className="login-body-homepage vh-100">
-        <div className="container py-5 h-100">
-          <div className="row d-flex justify-content-center align-items-center h-100">
-            <div className="col-12 col-md-8 col-lg-6 col-xl-5 mt-4">
-              <div className="card o-hidden border-0 shadow-lg my-5 justify-content-center">
-                <div className="card-body p-0 ">
-                  <div className="">
-                    <div className="col-lg-12 align-items-center justify-content-between">
-                      <div className="p-5">
-                        <div className="text-center">
-                          <div className="py-3">
-                            <h3 className="">Welcome to Sample Web App!</h3>
+  if (finalLoader) {
+    return (
+      <>
+        <div className="loading-container">
+          <div className="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+        </div>
 
-                            <span className="text-secondary text-muted fw-light small">
-                              Login with your details to continue
-                            </span>
-                          </div>
-                        </div>
-                        <form onSubmit={login}>
-                          <div className="form-group my-2">
-                            <input
-                              type="email"
-                              className="form-control form-control-user rounded-3"
-                              id="exampleInputEmail"
-                              aria-describedby="emailHelp"
-                              placeholder="Email Address"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              required
-                              autoComplete="on"
-                            />
-                          </div>
+      </>
 
-                          <div className="form-group position-relative">
-                            <input
-                              type={eyePassword === false ? 'password' : 'text'}
-                              className="form-control form-control-user rounded-3"
-                              id="exampleInputPassword"
-                              placeholder="Password"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              required
-                              style={{ paddingRight: '2.5rem' }}
-                              autoComplete="on"
-                            />
+    )
+  } else if (authorized === "true") {
+    navigate(`/home`);
+  } else {
+    return (
+      <>
+        <section className="login-body-homepage vh-100">
+          <div className="container py-5 h-100">
+            <div className="row d-flex justify-content-center align-items-center h-100">
+              <div className="col-12 col-md-8 col-lg-6 col-xl-5 mt-4">
+                <div className="card o-hidden border-0 shadow-lg my-5 justify-content-center">
+                  <div className="card-body p-0 ">
+                    <div className="">
+                      <div className="col-lg-12 align-items-center justify-content-between">
+                        <div className="p-5">
+                          <div className="text-center">
+                            <div className="py-3">
+                              <h3 className="">Welcome to Sample Web App!</h3>
+
+                              <span className="text-secondary text-muted fw-light small">
+                                Login with your details to continue
+                              </span>
+                            </div>
+                          </div>
+                          <form onSubmit={login}>
+                            <div className="form-group my-2">
+                              <input
+                                type="email"
+                                className="form-control form-control-user rounded-3"
+                                id="exampleInputEmail"
+                                aria-describedby="emailHelp"
+                                placeholder="Email Address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                autoComplete="on"
+                              />
+                            </div>
+
+                            <div className="form-group position-relative">
+                              <input
+                                type={eyePassword === false ? 'password' : 'text'}
+                                className="form-control form-control-user rounded-3"
+                                id="exampleInputPassword"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                style={{ paddingRight: '2.5rem' }}
+                                autoComplete="on"
+                              />
+                              {
+                                password.length > 0 ?
+                                  <div className="text-secondary" onClick={togglePasswordVisibility}
+                                    style={{
+                                      cursor: 'pointer',
+                                      position: 'absolute',
+                                      top: '45%',
+                                      right: '15px',
+                                      transform: 'translateY(-50%)',
+                                    }}>
+                                    {eyePassword === false ?
+                                      <FaEyeSlash />
+                                      :
+                                      <FaEye />
+                                    }
+
+                                  </div>
+                                  :
+                                  ""
+                              }
+
+
+
+                            </div>
                             {
-                              password.length > 0 ?
-                                <div className="text-secondary" onClick={togglePasswordVisibility}
-                                  style={{
-                                    cursor: 'pointer',
-                                    position: 'absolute',
-                                    top: '45%',
-                                    right: '15px',
-                                    transform: 'translateY(-50%)',
-                                  }}>
-                                  {eyePassword === false ?
-                                    <FaEyeSlash />
-                                    :
-                                    <FaEye />
-                                  }
-
-                                </div>
+                              loginLoader === false ?
+                                <button
+                                  type="submit"
+                                  className="btn loginpage-login-btn text-light col-12 mt-2 rounded-5"
+                                >
+                                  Log in
+                                </button>
                                 :
-                                ""
+                                <button className="btn btn-primary rounded-5 col-12 mt-2 text-light" type="button" disabled>
+                                  <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                  <span role="status" className="ms-1">Loading...</span>
+                                </button>
                             }
 
+                          </form>
+
+                          {userPrompt === true &&
+                            email.length === 0 &&
+                            password.length === 0 ? (
+                            <>
+                              <p className="text-center m-0 p-0 mt-3 text-danger">
+                                {invprompt}
+                              </p>
 
 
-                          </div>
-                          {
-                            loginLoader === false ?
-                              <button
-                                type="submit"
-                                className="btn loginpage-login-btn text-light col-12 mt-2 rounded-5"
-                              >
-                                Log in
-                              </button>
-                              :
-                              <button className="btn btn-primary rounded-5 col-12 mt-2 text-light" type="button" disabled>
-                                <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                                <span role="status" className="ms-1">Loading...</span>
-                              </button>
-                          }
+                            </>
+                          ) : (
+                            <div className="text-center m-0 p-0 mt-3">
 
-                        </form>
-
-                        {userPrompt === true &&
-                          email.length === 0 &&
-                          password.length === 0 ? (
-                          <>
-                            <p className="text-center m-0 p-0 mt-3 text-danger">
-                              {invprompt}
-                            </p>
-
-                            <div className="text-center m-0 p-0 mt-2">
-                              <Link className=" text-primary fw-light login-forgot-function" to="/otp">
-                                Forgot password?
-                              </Link>
                             </div>
-                          </>
-                        ) : (
-                          <div className="text-center m-0 p-0 mt-3">
-                            <Link className=" text-primary fw-light login-forgot-function" to="/otp">
-                              Forgot password?
+                          )}
+
+
+
+                          <hr />
+                          <div className="text-center">
+                            <span className="text-muted fw-light small">
+                              Don't have an account?
+                            </span>
+                            <Link
+                              to="/register"
+                              className="small fw-semibold ms-1 text-dark loginpage-signup-btn"
+                            >
+                              Sign up
                             </Link>
                           </div>
-                        )}
-
-
-
-                        <hr />
-                        <div className="text-center">
-                          <span className="text-muted fw-light small">
-                            Don't have an account?
-                          </span>
-                          <Link
-                            to="/register"
-                            className="small fw-semibold ms-1 text-dark loginpage-signup-btn"
-                          >
-                            Sign up
-                          </Link>
                         </div>
                       </div>
                     </div>
@@ -206,10 +248,12 @@ function LoginPage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-    </>
-  );
+        </section>
+      </>
+    );
+  }
+
+
 }
 
 export default LoginPage;
