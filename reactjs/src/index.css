@@ -33,3 +33,12 @@
   text-decoration: underline;
 
 }
+
+.SignUp-body-homepage {
+  background-size: cover;
+  min-height: 100vh;
+}
+
+.eye-signup {
+  margin-top: 500px;
+}
